@@ -29,7 +29,7 @@ class ChatRoom extends StatelessWidget {
         await _firestore
             .collection('chats')
             .doc(chatId)
-            .collection('chats')
+            .collection('chat')
             .add(messages);
 
         _message.clear();
@@ -39,23 +39,39 @@ class ChatRoom extends StatelessWidget {
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(title: Text(userMap!['username'])),
       body: SingleChildScrollView(
           child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
               height: screenHeight / 1.25,
               width: screenWidth,
               child: StreamBuilder<QuerySnapshot>(
                 stream: _firestore
-                    .collection('chat')
-                    .doc(chatId)
                     .collection('chats')
-                    .orderBy('time', descending: true)
+                    .doc(chatId)
+                    .collection('chat')
+                    .orderBy('time', descending: false)
                     .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.data != null) {
+                  // if (snapshot.connectionState == ConnectionState.waiting) {
+                  //   return const Center(
+                  //     child: CircularProgressIndicator(
+                  //       valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                  //       strokeWidth: 4.0,
+                  //     ),
+                  //   );
+                  // }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return Center(
+                        child: Text(
+                      'No messages yet',
+                      textAlign: TextAlign.center,
+                    ));
+                  } else {
                     return ListView.builder(
                       itemBuilder: (context, index) {
                         return messages(
@@ -66,8 +82,6 @@ class ChatRoom extends StatelessWidget {
                       },
                       itemCount: snapshot.data!.docs.length,
                     );
-                  } else {
-                    return Container();
                   }
                 },
               ))
@@ -83,7 +97,7 @@ class ChatRoom extends StatelessWidget {
             child: Row(children: [
               Container(
                 height: screenHeight / 12,
-                width: screenWidth / 1.5,
+                width: screenWidth / 1.3,
                 child: TextField(
                   controller: _message,
                   decoration: InputDecoration(
@@ -111,9 +125,9 @@ class ChatRoom extends StatelessWidget {
             : Alignment.centerLeft,
         child: Container(
           padding: EdgeInsets.symmetric(
-              vertical: height * 0.1, horizontal: width * 0.05),
+              vertical: height * 0.01, horizontal: width * 0.05),
           margin: EdgeInsets.symmetric(
-              vertical: height * 0.1, horizontal: width * 0.05),
+              vertical: height * 0.003, horizontal: width * 0.05),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             color: bannerBackground,

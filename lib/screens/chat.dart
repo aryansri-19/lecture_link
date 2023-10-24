@@ -17,7 +17,7 @@ class _ChatState extends State<Chat> {
 
   String chatRoomId(String user1, String user2) {
     if (user1[0].toLowerCase().codeUnits[0] >
-        user2[0].toLowerCase().codeUnits[0]) {
+        user2.toLowerCase().codeUnits[0]) {
       return "$user1$user2";
     } else {
       return "$user2$user1";
@@ -30,7 +30,9 @@ class _ChatState extends State<Chat> {
         await firestore.collection('users').get();
     List<Map<String, dynamic>> userMap = [];
     for (DocumentSnapshot doc in map.docs) {
-      userMap.add(doc.data() as Map<String, dynamic>);
+      if (doc['username'] != _auth.currentUser!.displayName) {
+        userMap.add(doc.data() as Map<String, dynamic>);
+      }
     }
     return userMap;
   }
@@ -66,8 +68,6 @@ class _ChatState extends State<Chat> {
                   strokeWidth: 4.0,
                 ),
               );
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
             } else if (!snapshot.hasData || snapshot.data == null) {
               return const Text('No user found');
             } else {
@@ -81,14 +81,13 @@ class _ChatState extends State<Chat> {
                       onTap: () {
                         String roomId = chatRoomId(
                             _auth.currentUser!.displayName!,
-                            userMap['username']); // Use userMap here
+                            userMap['username']);
 
                         Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => ChatRoom(
-                                userMap: userMap,
-                                chatId: roomId))); // Use userMap here
+                            builder: (_) =>
+                                ChatRoom(userMap: userMap, chatId: roomId)));
                       },
-                      title: Text('${userMap['username']}'), // Use userMap here
+                      title: Text('${userMap['username']}'),
                     ),
                   );
                 },

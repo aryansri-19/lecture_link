@@ -43,9 +43,18 @@ class AuthMethods {
     String res = 'Could not log in';
     try {
       if (email.isNotEmpty && password.isNotEmpty) {
-        await _auth.signInWithEmailAndPassword(
-            email: email, password: password);
+        User? user = (await _auth.signInWithEmailAndPassword(
+                email: email, password: password))
+            .user;
         res = 'Success';
+        QuerySnapshot<Map<String, dynamic>> getUser = await _firestore
+            .collection('users')
+            .where('email', isEqualTo: email)
+            .get();
+        String username = getUser.docs[0]['username'];
+        if (user != null) {
+          user.updateDisplayName(username);
+        }
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
