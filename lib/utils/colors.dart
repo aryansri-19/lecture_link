@@ -7,4 +7,4 @@ const contrast = Color.fromRGBO(200, 200, 200, 1);
 var textColor = Colors.grey.shade400;
 
 var bannerBackground = const Color.fromRGBO(58, 55, 176, 1);
-var bannerBackground2 = const Color.fromRGBO(20, 17, 88, 1);
+var bannerBackground2 = const Color.fromARGB(255, 244, 67, 54);

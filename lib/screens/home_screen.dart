@@ -17,6 +17,7 @@ class _HomePageState extends State<HomePage> {
     final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
+          toolbarHeight: screenHeight * 0.068,
           flexibleSpace: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -45,7 +46,7 @@ class _HomePageState extends State<HomePage> {
               },
               icon: const Icon(Icons.message),
               padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.05,
+                  horizontal: screenWidth * 0.03,
                   vertical: screenHeight * 0.01),
             )
           ]),

@@ -40,7 +40,25 @@ class ChatRoom extends StatelessWidget {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(title: Text(userMap!['username'])),
+      appBar: AppBar(
+          title: StreamBuilder<DocumentSnapshot>(
+        stream: _firestore.collection('users').doc(userMap!['uid']).snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.data != null) {
+            return Container(
+              child: Column(children: [
+                Text(userMap!['username']),
+                Text(
+                  snapshot.data!['status'],
+                  style: const TextStyle(fontSize: 12),
+                )
+              ]),
+            );
+          } else {
+            return Container();
+          }
+        },
+      )),
       body: SingleChildScrollView(
           child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -66,7 +84,7 @@ class ChatRoom extends StatelessWidget {
                   //   );
                   // }
                   if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return Center(
+                    return const Center(
                         child: Text(
                       'No messages yet',
                       textAlign: TextAlign.center,

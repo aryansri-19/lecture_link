@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lecture_link/utils/colors.dart';
@@ -12,14 +14,34 @@ class LayoutScreen extends StatefulWidget {
   State<LayoutScreen> createState() => _LayoutScreenState();
 }
 
-class _LayoutScreenState extends State<LayoutScreen> {
+class _LayoutScreenState extends State<LayoutScreen>
+    with WidgetsBindingObserver {
   int _page = 0;
   late PageController pageController;
+  late final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  late final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  void setStatus(String status) async {
+    await _firestore
+        .collection('users')
+        .doc(_auth.currentUser!.uid)
+        .update({"status": status});
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      setStatus("Online");
+    } else {
+      setStatus("Offline");
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     pageController = PageController();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   void onPageChanged(int page) {

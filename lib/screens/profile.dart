@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lecture_link/screens/login.dart';
 import '../server/auth_methods.dart';
@@ -11,6 +12,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  late final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   bool isLoading = false;
   void logOut() async {
     setState(() {

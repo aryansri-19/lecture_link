@@ -23,6 +23,7 @@ class _SearchPageState extends State<SearchPage> {
       setState(() {
         if (value.docs.isNotEmpty) {
           _userMap = value.docs[0].data();
+          print(_userMap);
         } else {
           _userMap = null;
         }
@@ -81,7 +82,7 @@ class _SearchPageState extends State<SearchPage> {
                     margin: const EdgeInsets.all(10),
                     child: ListTile(
                       title: Text('Username: ${_userMap!['username']}'),
-                      subtitle: Text('Email: ${_userMap!['email']}'),
+                      subtitle: Text('${_userMap!['status']}'),
                     ),
                   );
                 } else {

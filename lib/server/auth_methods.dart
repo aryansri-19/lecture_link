@@ -23,6 +23,8 @@ class AuthMethods {
             'username': username,
             'email': email,
             'password': password,
+            "status": "Unavailable",
+            "uid": _auth.currentUser!.uid,
           });
         }
       }
@@ -60,7 +62,7 @@ class AuthMethods {
       if (e.code == 'user-not-found') {
         res = 'Sign Up First. Duh!';
       } else if (e.code == 'wrong-password') {
-        res = "That's  noit your password";
+        res = "That's not your password";
       }
     } catch (e) {
       res = e.toString();
@@ -71,6 +73,10 @@ class AuthMethods {
   Future<String> signOut() async {
     String res = 'Error signing out';
     try {
+      String? user_uid = _auth.currentUser!.uid;
+      await _firestore.collection("users").doc(user_uid).update({
+        "status": "Offline",
+      });
       await _auth.signOut();
       res = 'Signed out successfully';
     } catch (e) {
