@@ -53,10 +53,11 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBxO-sFwedBFQenfWS5UEOEMCQ2fvhaUV0',
-    appId: '1:419907268183:android:154210eebe6ec38351bd12',
-    messagingSenderId: '419907268183',
-    projectId: 'lecture-link-2023',
-    storageBucket: 'lecture-link-2023.appspot.com',
-  );
+    apiKey: 'example.apiKey',
+    appId: 'exampe.apiId',
+    messagingSenderId: 'example.messagingSenderId',
+    projectId: 'example.projectId',
+    storageBucket: 'example.storageBucket',
+  ); 
+    /// fill the api details by configuring your own firebase project.
 }
