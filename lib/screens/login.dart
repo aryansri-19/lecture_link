@@ -63,12 +63,13 @@ class _LoginScreenState extends State<LoginScreen> {
         SizedBox(
           height: screenHeight * 0.03,
         ),
-        inputField('Domain Email', Icons.email, false, _emailController),
+        inputField(
+            'Domain Email', Icons.email, false, _emailController, isLoading),
         SizedBox(
           height: screenHeight * 0.03,
         ),
         inputField('Knock-Knock, Password Please', Icons.lock, true,
-            _passwordController),
+            _passwordController, isLoading),
         SizedBox(
           height: screenHeight * 0.03,
         ),

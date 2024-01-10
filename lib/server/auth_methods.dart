@@ -84,4 +84,16 @@ class AuthMethods {
     }
     return res;
   }
+
+  Future<String> deleteUser() async {
+    String res = "Error deleting account";
+    try {
+      User? user = _auth.currentUser!;
+      await user?.delete();
+      res = "Account Deleted";
+    } catch (e) {
+      print(e);
+    }
+    return res;
+  }
 }

@@ -1,6 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:lecture_link/screens/TopicScreen.dart';
+// import 'package:lecture_link/screens/add_notes.dart';
 import 'package:lecture_link/utils/colors.dart';
+import 'package:lecture_link/widgets/topic.dart';
+// import 'package:lecture_link/utils/tags.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -11,7 +15,9 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   Map<String, dynamic>? _userMap;
+  final FocusNode _focusNode = FocusNode();
   final TextEditingController _searchController = TextEditingController();
+  bool isSearching = false;
 
   void onSearch() async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -32,7 +38,26 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      setState(() {
+        isSearching = _focusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final screenwidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -56,6 +81,7 @@ class _SearchPageState extends State<SearchPage> {
             ],
             title: TextField(
               controller: _searchController,
+              focusNode: _focusNode,
               decoration: InputDecoration(
                   hintText: 'Search',
                   border: InputBorder.none,
@@ -77,28 +103,136 @@ class _SearchPageState extends State<SearchPage> {
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
-                if (_userMap != null) {
-                  return Card(
-                    margin: const EdgeInsets.all(10),
-                    child: ListTile(
-                      title: Text('Username: ${_userMap!['username']}'),
-                      subtitle: Text('${_userMap!['status']}'),
-                    ),
-                  );
+                if (isSearching) {
+                  return _buildSearchResults();
                 } else {
-                  // Show empty placeholder
                   return Container(
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.all(20),
-                    child: const Text('No user found'),
-                  );
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () => {
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const TopicScreen()))
+                                  },
+                                  child: topic(
+                                      "Assignments",
+                                      Colors.yellow,
+                                      Colors.orange,
+                                      Icons.assignment_turned_in_outlined,
+                                      11.8),
+                                ),
+                                SizedBox(
+                                  width: screenwidth * 0.07,
+                                ),
+                                GestureDetector(
+                                  onTap: () => {
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const TopicScreen()))
+                                  },
+                                  child: topic(
+                                      "Notes",
+                                      Colors.blue,
+                                      Colors.blueAccent,
+                                      Icons.note_alt_outlined,
+                                      13),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () => {
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const TopicScreen()))
+                                  },
+                                  child: topic(
+                                      "Tests",
+                                      Colors.green,
+                                      Colors.greenAccent,
+                                      Icons.assignment_outlined,
+                                      13),
+                                ),
+                                SizedBox(
+                                  width: screenwidth * 0.07,
+                                ),
+                                GestureDetector(
+                                  onTap: () => {
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const TopicScreen()))
+                                  },
+                                  child: topic(
+                                      "Information",
+                                      Colors.purple,
+                                      Colors.purpleAccent,
+                                      Icons.announcement_outlined,
+                                      13),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: screenHeight * 0.03,
+                            ),
+                            const SizedBox(
+                              child: Text(
+                                "Tags",
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const Row(
+                              children: [
+                                Column(
+                                  children: [],
+                                )
+                              ],
+                            )
+                          ]));
                 }
               },
               childCount: 1,
             ),
-          ),
+          )
         ],
       ),
     );
+  }
+
+  Widget _buildSearchResults() {
+    if (_userMap != null) {
+      return Card(
+        margin: const EdgeInsets.all(10),
+        child: ListTile(
+          title: Text('${_userMap!['username']}'),
+          subtitle: Text('${_userMap!['status']}'),
+        ),
+      );
+    } else {
+      // Show empty placeholder
+      return Container(
+        alignment: Alignment.center,
+        padding: const EdgeInsets.all(20),
+        child: const Text('No user found'),
+      );
+    }
   }
 }

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lecture_link/utils/colors.dart';
 
-TextField inputField(
-    String text, IconData icon, bool isPass, TextEditingController controller) {
+TextField inputField(String text, IconData icon, bool isPass,
+    TextEditingController controller, bool isLoading) {
   // bool visibility = false;
   return TextField(
+    enabled: !isLoading,
     controller: controller,
     obscureText: isPass,
     enableSuggestions: !isPass,

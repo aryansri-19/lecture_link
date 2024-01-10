@@ -21,7 +21,7 @@ class ChatRoom extends StatelessWidget {
 
     void onSend() async {
       if (_message.text.isNotEmpty) {
-        Map<String, dynamic> messages = {
+        Map<String, dynamic> message = {
           'sender': _auth.currentUser!.displayName,
           'message': _message.text,
           'time': FieldValue.serverTimestamp(),
@@ -30,7 +30,7 @@ class ChatRoom extends StatelessWidget {
             .collection('chats')
             .doc(chatId)
             .collection('chat')
-            .add(messages);
+            .add(message);
 
         _message.clear();
       } else {
@@ -46,12 +46,15 @@ class ChatRoom extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.data != null) {
             return Container(
-              child: Column(children: [
+              child: Row(children: [
+                Icon(
+                  Icons.circle,
+                  size: screenHeight * 0.01,
+                  color: userMap!['status'] == 'Online'
+                      ? Colors.green.shade400
+                      : Colors.grey.shade800,
+                ),
                 Text(userMap!['username']),
-                Text(
-                  snapshot.data!['status'],
-                  style: const TextStyle(fontSize: 12),
-                )
               ]),
             );
           } else {
@@ -59,102 +62,106 @@ class ChatRoom extends StatelessWidget {
           }
         },
       )),
-      body: SingleChildScrollView(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Column(
         children: [
-          Container(
-              height: screenHeight / 1.25,
-              width: screenWidth,
+          Expanded(
               child: StreamBuilder<QuerySnapshot>(
-                stream: _firestore
-                    .collection('chats')
-                    .doc(chatId)
-                    .collection('chat')
-                    .orderBy('time', descending: false)
-                    .snapshots(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                  // if (snapshot.connectionState == ConnectionState.waiting) {
-                  //   return const Center(
-                  //     child: CircularProgressIndicator(
-                  //       valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-                  //       strokeWidth: 4.0,
-                  //     ),
-                  //   );
-                  // }
-                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return const Center(
-                        child: Text(
-                      'No messages yet',
-                      textAlign: TextAlign.center,
-                    ));
-                  } else {
-                    return ListView.builder(
-                      itemBuilder: (context, index) {
-                        return messages(
-                            screenWidth,
-                            screenHeight,
-                            snapshot.data!.docs[index].data()
-                                as Map<String, dynamic>);
-                      },
-                      itemCount: snapshot.data!.docs.length,
-                    );
-                  }
-                },
-              ))
-        ],
-      )),
-      bottomNavigationBar: Container(
-          height: screenHeight * 0.1,
-          width: screenWidth,
-          alignment: Alignment.center,
-          child: Container(
-            height: screenHeight / 12,
-            width: screenWidth / 1.1,
-            child: Row(children: [
-              Container(
-                height: screenHeight / 12,
-                width: screenWidth / 1.3,
-                child: TextField(
-                  controller: _message,
-                  decoration: InputDecoration(
-                    hintText: "Type a message",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+            stream: _firestore
+                .collection('chats')
+                .doc(chatId)
+                .collection('chat')
+                .orderBy('time', descending: true)
+                .snapshots(),
+            builder:
+                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              // if (snapshot.connectionState == ConnectionState.waiting) {
+              //   return const Center(
+              //     child: CircularProgressIndicator(
+              //       valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+              //       strokeWidth: 4.0,
+              //     ),
+              //   );
+              // }
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return const Center(
+                    child: Text(
+                  'No messages yet',
+                  textAlign: TextAlign.center,
+                ));
+              } else {
+                return ListView.builder(
+                  reverse: true,
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (context, index) {
+                    return messages(
+                        screenWidth,
+                        screenHeight,
+                        snapshot.data!.docs[index].data()
+                            as Map<String, dynamic>);
+                  },
+                );
+              }
+            },
+          )),
+          Container(
+            height: screenHeight * 0.1,
+            width: screenWidth,
+            alignment: Alignment.center,
+            child: Container(
+              height: screenHeight / 12,
+              width: screenWidth / 1.1,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _message,
+                      decoration: InputDecoration(
+                        hintText: "Type a message",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  IconButton(
+                    icon: const Icon(Icons.send),
+                    onPressed: onSend,
+                  )
+                ],
               ),
-              IconButton(
-                icon: const Icon(Icons.send),
-                onPressed: onSend,
-              )
-            ]),
-          )),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget messages(double width, double height, Map<String, dynamic> messages) {
-    return Container(
-        width: width,
-        alignment: messages['sender'] == _auth.currentUser!.displayName
-            ? Alignment.centerRight
-            : Alignment.centerLeft,
-        child: Container(
-          padding: EdgeInsets.symmetric(
-              vertical: height * 0.01, horizontal: width * 0.05),
-          margin: EdgeInsets.symmetric(
-              vertical: height * 0.003, horizontal: width * 0.05),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: bannerBackground,
-          ),
-          child: Text(
-            messages['message'],
-            style: const TextStyle(
-                color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
-          ),
-        ));
+    return Column(
+      children: [
+        Container(
+            alignment: messages['sender'] == _auth.currentUser!.displayName
+                ? Alignment.bottomRight
+                : Alignment.bottomLeft,
+            width: width,
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                  vertical: height * 0.01, horizontal: width * 0.05),
+              margin: EdgeInsets.symmetric(
+                  vertical: height * 0.003, horizontal: width * 0.05),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: bannerBackground,
+              ),
+              child: Text(
+                messages['message'],
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500),
+              ),
+            ))
+      ],
+    );
   }
 }

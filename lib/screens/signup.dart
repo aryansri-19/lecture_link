@@ -70,17 +70,17 @@ class _SignupScreenState extends State<SignupScreen> {
                 height: screenHeight * 0.03,
               ),
               inputField('What Shall We Call You?', Icons.person_outline, false,
-                  _usernameController),
+                  _usernameController, isLoading),
               SizedBox(
                 height: screenHeight * 0.03,
               ),
               inputField('Domain Email', Icons.email_outlined, false,
-                  _emailController),
+                  _emailController, isLoading),
               SizedBox(
                 height: screenHeight * 0.03,
               ),
               inputField('Keep A Secret Code', Icons.lock_outline, true,
-                  _passwordController),
+                  _passwordController, isLoading),
               SizedBox(
                 height: screenHeight * 0.03,
               ),
